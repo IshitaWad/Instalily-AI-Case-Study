@@ -1,6 +1,5 @@
 """
-Streamlit Web App for Lead Generation AI Agent
-Beautiful dashboard interface for generating and viewing leads
+Streamlit web app UI
 """
 
 import streamlit as st
@@ -228,7 +227,7 @@ if generate_button:
     async def generate_leads_async():
         try:
             # Initialize components
-            status_text.text("🔧 Initializing components...")
+            status_text.text("Initializing components...")
             progress_bar.progress(10)
             
             scraper = WebScraper()
@@ -236,7 +235,7 @@ if generate_button:
             
             if use_real_data:
                 # Use real data processor
-                status_text.text("🔍 Researching industry events with AI...")
+                status_text.text("Researching industry events with AI...")
                 progress_bar.progress(20)
                 
                 processor = RealDataLeadProcessor(scraper, deepseek_client)
@@ -244,18 +243,18 @@ if generate_button:
                 status_text.text("🏢 Identifying companies with AI...")
                 progress_bar.progress(40)
                 
-                status_text.text("🌐 Scraping real company data...")
+                status_text.text("Scraping real company data...")
                 progress_bar.progress(60)
                 
-                status_text.text("🧠 Enriching with AI analysis...")
+                status_text.text("Enriching with AI analysis...")
                 progress_bar.progress(80)
                 
                 leads = await processor.generate_real_leads(industry, max_results=max_leads)
             else:
-                # Use demo mode with clean mock data
+                # testing mode with sample data
                 from lead_processor import LeadProcessor
                 
-                status_text.text("📊 Processing sample companies...")
+                status_text.text("Processing sample companies...")
                 progress_bar.progress(30)
                 
                 # Sample companies with proper data
@@ -312,7 +311,7 @@ if generate_button:
                     }
                 ][:max_leads]
                 
-                status_text.text("🔍 Generating qualification rationale...")
+                status_text.text("Generating qualification rationale...")
                 progress_bar.progress(50)
                 
                 # Add qualification rationale
@@ -320,7 +319,7 @@ if generate_button:
                 for company in sample_companies:
                     company['qualification_rationale'] = processor._generate_qualification_rationale(company)
                 
-                status_text.text("👥 Identifying decision makers...")
+                status_text.text("Identifying decision makers...")
                 progress_bar.progress(70)
                 with_contacts = await processor.identify_decision_makers(sample_companies)
                 
@@ -329,7 +328,7 @@ if generate_button:
                 leads = await processor.generate_outreach_messages(with_contacts)
             
             # Validate leads
-            status_text.text("✅ Validating leads...")
+            status_text.text("Validating leads...")
             progress_bar.progress(95)
             validated_leads = validate_leads_batch(leads)
             
@@ -342,7 +341,7 @@ if generate_button:
             st.session_state.dashboard_data = dashboard_data
             
             progress_bar.progress(100)
-            status_text.text("✅ Lead generation complete!")
+            status_text.text("Lead generation complete!")
             
             # Cleanup
             await scraper.close()
@@ -350,7 +349,7 @@ if generate_button:
             return True
             
         except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
+            st.error(f"Error: {str(e)}")
             return False
     
     # Run async function
@@ -574,7 +573,6 @@ if st.session_state.leads and st.session_state.dashboard_data:
                 )
             
             with col2:
-                # For Excel, we'll use the dashboard generator
                 if st.button("Generate Excel", use_container_width=True):
                     dashboard_gen = DashboardGenerator()
                     excel_file = f"leads_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
@@ -585,34 +583,6 @@ else:
     # Welcome screen
     st.info("Configure settings in the sidebar and click **Generate Leads** to start")
     
-    st.markdown("### Features")
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown("""
-        **AI-Powered Research**
-        - Event identification
-        - Company discovery
-        - Market intelligence
-        """)
-    
-    with col2:
-        st.markdown("""
-        **Decision Maker ID**
-        - VP/Director targeting
-        - Role-based personas
-        - Contact information
-        """)
-    
-    with col3:
-        st.markdown("""
-        **Personalized Outreach**
-        - AI-generated messages
-        - Company-specific
-        - Professional tone
-        """)
-
 # Footer
 st.markdown("---")
 st.markdown(
