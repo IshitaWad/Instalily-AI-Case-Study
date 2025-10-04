@@ -388,10 +388,10 @@ if st.session_state.leads and st.session_state.dashboard_data:
     
     with col3:
         if summary.get('average_revenue', 0) > 0:
-            avg_m = summary['average_revenue'] / 1000000
+            avg_m = summary['average_revenue'] / 1000000000
             st.metric(
                 "Avg Revenue",
-                f"${avg_m:.0f}M",
+                f"${avg_m:.0f}B",
                 delta=None
             )
         else:

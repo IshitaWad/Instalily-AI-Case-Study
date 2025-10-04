@@ -159,7 +159,7 @@ class WebScraper:
             logger.error(f"Error scraping LinkedIn for {company_name}: {str(e)}")
             return {}
 
-'''
+    '''
     async def _scrape_crunchbase(self, company_name: str) -> Dict:
         """Scrape Crunchbase company data"""
         try:
@@ -196,7 +196,7 @@ class WebScraper:
         except Exception as e:
             logger.error(f"Error scraping Crunchbase for {company_name}: {str(e)}")
             return {}
-'''
+    '''
 
     def _parse_revenue(self, revenue_text: str) -> Optional[float]:
         """Parse revenue text into numeric value"""
