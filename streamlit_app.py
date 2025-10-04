@@ -23,41 +23,122 @@ from validation import validate_leads_batch
 # Page configuration
 st.set_page_config(
     page_title="Lead Generation AI Agent",
-    page_icon="🎯",
+    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better styling
+# Custom CSS for professional dashboard styling
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1f77b4;
-        text-align: center;
-        padding: 1rem 0;
+    /* Color Scheme */
+    :root {
+        --primary-blue: #2563EB;
+        --bg-light: #F9FAFB;
+        --border-gray: #E5E7EB;
+        --text-dark: #111827;
+        --text-muted: #6B7280;
+        --success-green: #10B981;
+        --warning-amber: #F59E0B;
+        --error-red: #EF4444;
+        --accent-indigo: #7C3AED;
     }
-    .metric-card {
-        background-color: #f0f2f6;
+    
+    /* Main header */
+    .main-header {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        text-align: center;
+        padding: 1.5rem 0;
+        border-bottom: 2px solid var(--border-gray);
+        margin-bottom: 1rem;
+    }
+    
+    /* Section headers */
+    .section-header {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 1.5rem 0 0.75rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-blue);
+    }
+    
+    /* Company list item */
+    .company-item {
+        background-color: white;
         padding: 1rem;
+        border: 1px solid var(--border-gray);
         border-radius: 0.5rem;
         margin: 0.5rem 0;
+        cursor: pointer;
+        transition: all 0.2s;
     }
-    .lead-card {
+    
+    .company-item:hover {
+        border-color: var(--primary-blue);
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    }
+    
+    .company-item.selected {
+        border-color: var(--primary-blue);
+        background-color: #EFF6FF;
+        border-width: 2px;
+    }
+    
+    /* Dashboard card */
+    .dashboard-card {
         background-color: white;
         padding: 1.5rem;
+        border: 1px solid var(--border-gray);
         border-radius: 0.5rem;
-        border-left: 4px solid #1f77b4;
         margin: 1rem 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .success-message {
-        background-color: #d4edda;
-        color: #155724;
+    
+    /* Metric display */
+    .metric-label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-top: 0.25rem;
+    }
+    
+    /* Info box */
+    .info-box {
+        background-color: var(--bg-light);
+        border-left: 4px solid var(--primary-blue);
         padding: 1rem;
-        border-radius: 0.5rem;
+        border-radius: 0.25rem;
         margin: 1rem 0;
+    }
+    
+    /* Success state */
+    .success-box {
+        background-color: #ECFDF5;
+        border-left: 4px solid var(--success-green);
+        padding: 1rem;
+        border-radius: 0.25rem;
+    }
+    
+    /* Remove emoji from buttons */
+    button[kind="primary"] {
+        background-color: var(--primary-blue) !important;
+        border-color: var(--primary-blue) !important;
+    }
+    
+    button[kind="secondary"] {
+        background-color: white !important;
+        border: 1px solid var(--border-gray) !important;
+        color: var(--text-dark) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -71,26 +152,25 @@ if 'processing' not in st.session_state:
     st.session_state.processing = False
 
 # Header
-st.markdown('<div class="main-header">🎯 Lead Generation AI Agent</div>', unsafe_allow_html=True)
-st.markdown("### Automated Lead Generation & Personalized Outreach for DuPont Tedlar")
-st.markdown("---")
+st.markdown('<div class="main-header">Lead Generation AI Agent</div>', unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #6B7280; margin-bottom: 2rem;'>Automated Lead Generation & Personalized Outreach for DuPont Tedlar</p>", unsafe_allow_html=True)
 
 # Sidebar - Configuration
 with st.sidebar:
-    st.header("⚙️ Configuration")
+    st.header("Configuration")
     
     # API Key status
     api_key = os.getenv('DEEPSEEK_API_KEY')
     if api_key and api_key != 'your_deepseek_api_key_here':
-        st.success("✅ API Key Configured")
+        st.success("API Key Configured")
     else:
-        st.error("❌ API Key Not Found")
+        st.error("API Key Not Found")
         st.info("Add DEEPSEEK_API_KEY to .env file")
     
     st.markdown("---")
     
     # Generation settings
-    st.subheader("🎯 Generation Settings")
+    st.subheader("Generation Settings")
     
     industry = st.text_input(
         "Target Industry",
@@ -116,7 +196,7 @@ with st.sidebar:
     
     # Generate button
     generate_button = st.button(
-        "🚀 Generate Leads",
+        "Generate Leads",
         type="primary",
         use_container_width=True
     )
@@ -125,17 +205,17 @@ with st.sidebar:
     
     # Export options
     if st.session_state.leads:
-        st.subheader("📥 Export Options")
+        st.subheader("Export Options")
         
         if st.button("Download CSV", use_container_width=True):
             dashboard_gen = DashboardGenerator()
             dashboard_gen.export_to_csv(st.session_state.leads, 'leads_export.csv')
-            st.success("✅ Exported to leads_export.csv")
+            st.success("Exported to leads_export.csv")
         
         if st.button("Download Excel", use_container_width=True):
             dashboard_gen = DashboardGenerator()
             dashboard_gen.export_to_excel(st.session_state.leads, 'leads_export.xlsx')
-            st.success("✅ Exported to leads_export.xlsx")
+            st.success("Exported to leads_export.xlsx")
 
 # Main content area
 if generate_button:
@@ -336,8 +416,8 @@ if st.session_state.leads and st.session_state.dashboard_data:
     
     # Left column: Company list
     with col_list:
-        st.markdown("### 📋 Companies")
-        st.markdown("Click to view details →")
+        st.markdown("### Companies")
+        st.markdown("<p style='color: #6B7280; font-size: 0.875rem;'>Select a company to view details</p>", unsafe_allow_html=True)
         
         for i, lead in enumerate(st.session_state.leads):
             # Create a button for each company
@@ -374,71 +454,56 @@ if st.session_state.leads and st.session_state.dashboard_data:
             lead = st.session_state.leads[st.session_state.selected_lead_index]
             
             # Company header
-            st.markdown(f"# {lead.get('company_name', 'Unknown')}")
+            st.markdown(f"<h1 style='color: #111827; margin-bottom: 1.5rem;'>{lead.get('company_name', 'Unknown')}</h1>", unsafe_allow_html=True)
             
-            # Revenue metric
+            # Section 1: Industry Fit
+            st.markdown('<div class="section-header">Industry Fit</div>', unsafe_allow_html=True)
+            st.markdown(f"<div class='info-box'><strong>Industry:</strong> {lead.get('industry', 'N/A')}<br><strong>Website:</strong> {lead.get('website', 'N/A')}</div>", unsafe_allow_html=True)
+            
+            # Section 2: Size & Revenue
+            st.markdown('<div class="section-header">Size & Revenue</div>', unsafe_allow_html=True)
             revenue = lead.get('estimated_revenue', 0)
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                if revenue >= 1000000000:
-                    st.metric("Revenue", f"${revenue/1000000000:.1f}B")
-                elif revenue > 0:
-                    st.metric("Revenue", f"${revenue/1000000:.0f}M")
-                else:
-                    st.metric("Revenue", "N/A")
-            with col2:
-                st.metric("Employees", f"{lead.get('employees', 'Unknown'):,}" if isinstance(lead.get('employees'), int) else lead.get('employees', 'Unknown'))
-            with col3:
-                st.metric("Industry", lead.get('industry', 'N/A'))
-            
-            st.markdown("---")
-            
-            # Website
-            st.markdown("### 🌐 Website")
-            website = lead.get('website', 'N/A')
-            if website != 'N/A' and website.startswith('http'):
-                st.markdown(f"[{website}]({website})")
+            if revenue >= 1000000000:
+                revenue_display = f"${revenue/1000000000:.1f}B"
+            elif revenue > 0:
+                revenue_display = f"${revenue/1000000:.0f}M"
             else:
-                st.write(website)
+                revenue_display = "N/A"
+            st.markdown(f"<div class='metric-label'>Annual Revenue</div><div class='metric-value'>{revenue_display}</div>", unsafe_allow_html=True)
             
-            # Events attending
+            # Section 3: Strategic Relevance
+            st.markdown('<div class="section-header">Strategic Relevance</div>', unsafe_allow_html=True)
+            st.markdown(f"<div class='info-box'>{lead.get('qualification_rationale', 'N/A')}</div>", unsafe_allow_html=True)
+            
+            # Section 4: Market Activity
             if lead.get('events_attending'):
-                st.markdown("### 🎪 Events Attending")
+                st.markdown('<div class="section-header">Market Activity</div>', unsafe_allow_html=True)
                 events_list = lead['events_attending']
+                events_html = "<div class='info-box'><strong>Industry Events:</strong><br>"
                 if isinstance(events_list, list):
                     for event in events_list:
-                        st.write(f"• {event}")
+                        events_html += f"• {event}<br>"
                 else:
-                    st.write(f"• {events_list}")
+                    events_html += f"• {events_list}<br>"
+                events_html += "</div>"
+                st.markdown(events_html, unsafe_allow_html=True)
             
-            # Qualification rationale
-            st.markdown("### 💡 Why This Lead Matters")
-            st.info(lead.get('qualification_rationale', 'N/A'))
-            
-            # Decision makers
+            # Section 5: Decision Makers (filter out N/A)
             if lead.get('decision_makers'):
-                st.markdown("### 👥 Decision Makers")
-                for dm in lead['decision_makers'][:3]:
-                    with st.expander(f"**{dm.get('title', 'N/A')}**"):
-                        st.write(dm.get('relevance', 'Key decision maker'))
-            
-            # Primary contact
-            if lead.get('primary_contact'):
-                contact = lead['primary_contact']
-                st.markdown("### 📧 Primary Contact")
+                # Filter out decision makers with N/A titles
+                valid_dms = [dm for dm in lead['decision_makers'] if dm.get('title') and dm.get('title') != 'N/A' and not dm.get('title').startswith('-')]
                 
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.write(f"**Name:** {contact.get('name', 'N/A')}")
-                    st.write(f"**Title:** {contact.get('title', 'N/A')}")
-                with col2:
-                    st.write(f"**Email:** {contact.get('email', 'N/A')}")
-                    if contact.get('linkedin_url') and contact.get('linkedin_url') != 'N/A':
-                        st.markdown(f"[🔗 LinkedIn Profile]({contact['linkedin_url']})")
+                if valid_dms:
+                    st.markdown('<div class="section-header">Decision Makers</div>', unsafe_allow_html=True)
+                    for idx, dm in enumerate(valid_dms[:3]):
+                        title = dm.get('title', '').replace('**', '').strip()
+                        relevance = dm.get('relevance', 'Key decision maker')
+                        with st.expander(f"{title}", expanded=False):
+                            st.write(relevance)
             
             # Outreach message
             if lead.get('outreach_message'):
-                st.markdown("### 💬 Personalized Outreach Message")
+                st.markdown('<div class="section-header">Personalized Outreach Message</div>', unsafe_allow_html=True)
                 st.text_area(
                     "Copy this message for your outreach:",
                     lead['outreach_message'],
@@ -446,21 +511,19 @@ if st.session_state.leads and st.session_state.dashboard_data:
                     key=f"outreach_detail_{st.session_state.selected_lead_index}",
                     label_visibility="collapsed"
                 )
-                
-                # Copy button hint
-                st.caption("💡 Tip: Click in the text area and press Ctrl+A then Ctrl+C to copy")
+                st.caption("Tip: Click in the text area and press Ctrl+A then Ctrl+C to copy")
     
     st.markdown("---")
     
     # Tabs for analytics and export
-    tab1, tab2 = st.tabs(["📊 Analytics", "📁 Export Data"])
+    tab1, tab2 = st.tabs(["Analytics", "Export Data"])
     
     with tab1:
         st.header("Analytics")
         
         # Revenue distribution
         if st.session_state.dashboard_data.get('leads_by_revenue'):
-            st.subheader("📊 Revenue Distribution")
+            st.subheader("Revenue Distribution")
             revenue_data = st.session_state.dashboard_data['leads_by_revenue']
             
             df_revenue = pd.DataFrame([
@@ -473,7 +536,7 @@ if st.session_state.leads and st.session_state.dashboard_data:
         
         # Industry breakdown
         if st.session_state.dashboard_data.get('leads_by_industry'):
-            st.subheader("🏢 Industry Breakdown")
+            st.subheader("Industry Breakdown")
             industry_data = st.session_state.dashboard_data['leads_by_industry']
             
             df_industry = pd.DataFrame([
@@ -493,17 +556,17 @@ if st.session_state.leads and st.session_state.dashboard_data:
         if export_data:
             df = pd.DataFrame(export_data)
             
-            st.subheader("📋 Preview")
+            st.subheader("Preview")
             st.dataframe(df, use_container_width=True)
             
-            st.subheader("📥 Download")
+            st.subheader("Download")
             
             col1, col2 = st.columns(2)
             
             with col1:
                 csv = df.to_csv(index=False)
                 st.download_button(
-                    label="📄 Download CSV",
+                    label="Download CSV",
                     data=csv,
                     file_name=f"leads_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                     mime="text/csv",
@@ -512,23 +575,23 @@ if st.session_state.leads and st.session_state.dashboard_data:
             
             with col2:
                 # For Excel, we'll use the dashboard generator
-                if st.button("📊 Generate Excel", use_container_width=True):
+                if st.button("Generate Excel", use_container_width=True):
                     dashboard_gen = DashboardGenerator()
                     excel_file = f"leads_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
                     dashboard_gen.export_to_excel(st.session_state.leads, excel_file)
-                    st.success(f"✅ Excel file generated: {excel_file}")
+                    st.success(f"Excel file generated: {excel_file}")
 
 else:
     # Welcome screen
-    st.info("👈 Configure settings in the sidebar and click **Generate Leads** to start!")
+    st.info("Configure settings in the sidebar and click **Generate Leads** to start")
     
-    st.markdown("### 🎯 Features")
+    st.markdown("### Features")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
-        **🔍 AI-Powered Research**
+        **AI-Powered Research**
         - Event identification
         - Company discovery
         - Market intelligence
@@ -536,7 +599,7 @@ else:
     
     with col2:
         st.markdown("""
-        **👥 Decision Maker ID**
+        **Decision Maker ID**
         - VP/Director targeting
         - Role-based personas
         - Contact information
@@ -544,20 +607,15 @@ else:
     
     with col3:
         st.markdown("""
-        **💬 Personalized Outreach**
+        **Personalized Outreach**
         - AI-generated messages
         - Company-specific
         - Professional tone
         """)
-    
-    st.markdown("---")
-    
-    st.markdown("### 📊 Sample Output")
-    st.image("https://via.placeholder.com/800x400/1f77b4/ffffff?text=Lead+Generation+Dashboard", use_container_width=True)
 
 # Footer
 st.markdown("---")
 st.markdown(
-    "<div style='text-align: center; color: #666;'>Built with ❤️ for DuPont Tedlar | Powered by DeepSeek AI</div>",
+    "<div style='text-align: center; color: #6B7280; font-size: 0.875rem;'>Built for DuPont Tedlar | Powered by DeepSeek AI</div>",
     unsafe_allow_html=True
 )

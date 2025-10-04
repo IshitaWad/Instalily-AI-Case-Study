@@ -166,25 +166,32 @@ class RealDataLeadProcessor:
             logger.info(f"Using AI to find companies in {industry}")
             
             prompt = f"""
-            List 15-20 major companies in the {industry} industry.
+            List 15-20 of the LARGEST and most prominent companies in the {industry} industry.
             {f"Context: These companies typically attend {event_context}" if event_context else ""}
+            
+            CRITICAL REQUIREMENTS:
+            1. ONLY include companies with annual revenue of $500M or more
+            2. Prioritize the TOP revenue companies first (multi-billion dollar enterprises)
+            3. You MUST provide accurate, real revenue figures - NO $0, NO guesses
+            4. If you don't know the exact revenue, provide a reasonable estimate based on company size
+            5. Sort by revenue (highest first)
             
             For each company provide in this exact format:
             
             1. [Company Name]
             Website: [actual company website URL - REQUIRED]
-            Revenue: [estimated annual revenue with $ and B/M]
-            Employees: [approximate number]
+            Revenue: [REAL annual revenue - must be $500M+ - use B for billions, M for millions]
+            Employees: [approximate number - must be realistic]
             Products: [main products/services]
             Events: [list 2-3 major trade shows/conferences they typically attend]
             
-            IMPORTANT: 
-            - You MUST include the actual, real website URL for each company
-            - Use the company's primary corporate website (e.g., https://www.3m.com, https://www.averydennison.com)
-            - Do NOT make up or guess website URLs
-            - Include specific trade shows and industry events they attend (e.g., ISA Sign Expo, PRINTING United)
-            - Focus on companies with revenue over $100M
-            - These should be real, verifiable companies
+            VALIDATION RULES:
+            - Revenue CANNOT be $0, $0M, or $0B
+            - Revenue must be a real number (e.g., $8.5B, $500M, $2.3B)
+            - If a company is publicly traded, use their actual reported revenue
+            - If private, estimate based on employee count and market position
+            - Larger companies (10,000+ employees) typically have $1B+ revenue
+            - Medium companies (1,000-10,000 employees) typically have $100M-$1B revenue
             
             Example format:
             1. 3M Commercial Graphics
@@ -193,6 +200,13 @@ class RealDataLeadProcessor:
             Employees: 95,000
             Products: Commercial graphics, signage materials, protective films
             Events: ISA Sign Expo, PRINTING United, SGIA Expo
+            
+            2. Avery Dennison Corporation
+            Website: https://www.averydennison.com
+            Revenue: $8.5 billion
+            Employees: 35,000
+            Products: Pressure-sensitive materials, graphics solutions
+            Events: ISA Sign Expo, Labelexpo, PRINTING United
             """
             
             response = await asyncio.get_event_loop().run_in_executor(
@@ -280,12 +294,25 @@ class RealDataLeadProcessor:
         if current_company and 'name' in current_company:
             companies.append(current_company)
         
-        # Set N/A for missing websites - DO NOT GENERATE
+        # Filter and validate companies
+        validated_companies = []
         for company in companies:
+            # Set N/A for missing websites
             if not company.get('website'):
                 company['website'] = 'N/A'
+            
+            # Filter out companies with $0 or missing revenue
+            revenue = company.get('estimated_revenue', 0)
+            if revenue > 0:
+                validated_companies.append(company)
+            else:
+                logger.warning(f"Filtered out {company.get('name')} - invalid revenue: {revenue}")
         
-        return companies
+        # Sort by revenue (highest first)
+        validated_companies.sort(key=lambda x: x.get('estimated_revenue', 0), reverse=True)
+        
+        logger.info(f"Validated {len(validated_companies)} companies with proper revenue data")
+        return validated_companies
 
     async def generate_real_leads(self, industry: str = "Graphics & Signage", max_results: int = 20) -> List[Dict]:
         """Generate leads using only real data sources"""
