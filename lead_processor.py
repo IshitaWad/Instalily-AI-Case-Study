@@ -48,6 +48,7 @@ class LeadProcessor:
             logger.error(f"Error researching events: {str(e)}")
             return []
 
+'''
     async def _search_event_info(self, event_name: str) -> Dict:
         """Search for event information"""
         # This would typically involve web searches or API calls
@@ -86,6 +87,7 @@ class LeadProcessor:
             "description": "Industry event for graphics and signage professionals",
             "companies": []
         })
+'''
 
     async def extract_companies_from_events(self, events_data: List[Dict]) -> List[Dict]:
         """Extract companies from event data"""
@@ -169,6 +171,7 @@ class LeadProcessor:
         logger.info(f"Filtered to {len(filtered_companies)} companies meeting revenue criteria")
         return filtered_companies[:max_results]
 
+'''
     def _assign_mock_revenue(self, company_name: str) -> float:
         """Assign mock revenue data for demo purposes"""
         # Large established companies
@@ -180,6 +183,7 @@ class LeadProcessor:
         }
 
         return large_companies.get(company_name, 500000000)  # Default $500M for others
+'''
 
     async def enrich_company_data(self, companies: List[Dict]) -> List[Dict]:
         """Enrich company data using scraping and DeepSeek"""
