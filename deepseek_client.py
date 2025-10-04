@@ -23,7 +23,6 @@ class DeepSeekClient:
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://github.com/dupont-tedlar",
                 "X-Title": "DuPont Tedlar Lead Generation"
             },
             timeout=60.0
