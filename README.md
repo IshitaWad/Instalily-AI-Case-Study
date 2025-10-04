@@ -5,8 +5,8 @@ This documentation outlines an AI agent created for DuPont Tedlar’s Graphics &
 
 ## Installation Steps:
 
-- Clone/download repository
+- Clone/download repository (git clone https://github.com/IshitaWad/Instalily-AI-Case-Study.git)
 - Install dependencies (pip install -r requirements.txt)
-- Obtain API key from https://openrouter.ai/ and configure in .env
+- Obtain API key from https://openrouter.ai/ and configure in .env (DEEPSEEK_API_KEY)
 - Run app (streamlit run streamlit_app.py)
 - Open browser (http://localhost:8501)
