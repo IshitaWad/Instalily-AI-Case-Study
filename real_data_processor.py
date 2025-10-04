@@ -1,5 +1,5 @@
 """
-Real data lead processor - No mock data, uses actual web scraping and AI
+Real data lead processor
 """
 
 import asyncio
@@ -12,8 +12,6 @@ from bs4 import BeautifulSoup
 logger = logging.getLogger(__name__)
 
 class RealDataLeadProcessor:
-    """Lead processor that uses only real data sources"""
-
     def __init__(self, scraper, deepseek_client):
         self.scraper = scraper
         self.deepseek_client = deepseek_client
