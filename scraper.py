@@ -136,8 +136,7 @@ class WebScraper:
     async def _scrape_linkedin(self, company_name: str) -> Dict:
         """Scrape LinkedIn company data"""
         try:
-            # This would typically use LinkedIn API, but for demo purposes we'll simulate
-            # In production, you'd integrate with LinkedIn Sales Navigator API
+            # This would be integrated with LinkedIn Sales Navigator API
             linkedin_url = f"https://www.linkedin.com/company/{company_name.lower().replace(' ', '-')}"
 
             async with self.session.get(linkedin_url) as response:
@@ -149,8 +148,7 @@ class WebScraper:
 
                 data = {}
 
-                # Extract company size and industry from LinkedIn
-                # This is a simplified extraction - real implementation would be more sophisticated
+                # Simplified extraction for company size and industry
                 size_match = soup.find(text=re.compile(r'(\d+(?:,\d+)*)\s*employees?', re.IGNORECASE))
                 if size_match:
                     data['employees_linkedin'] = size_match.strip()
@@ -161,6 +159,7 @@ class WebScraper:
             logger.error(f"Error scraping LinkedIn for {company_name}: {str(e)}")
             return {}
 
+'''
     async def _scrape_crunchbase(self, company_name: str) -> Dict:
         """Scrape Crunchbase company data"""
         try:
@@ -197,6 +196,7 @@ class WebScraper:
         except Exception as e:
             logger.error(f"Error scraping Crunchbase for {company_name}: {str(e)}")
             return {}
+'''
 
     def _parse_revenue(self, revenue_text: str) -> Optional[float]:
         """Parse revenue text into numeric value"""
